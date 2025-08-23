@@ -1,0 +1,87 @@
+{
+  "name": "llm-agent-poc",
+  "version": "2.0.0",
+  "description": "LLM Agent Proof-of-Concept: Browser-Based Multi-Tool Reasoning (apiagent architecture)",
+  "main": "index.html",
+  "scripts": {
+    "start": "python server.py",
+    "dev": "python server.py",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "llm",
+    "agent",
+    "ai",
+    "browser",
+    "tools",
+    "reasoning",
+    "javascript",
+    "bootstrap",
+    "apiagent",
+    "lit-html",
+    "asyncllm"
+  ],
+  "dependencies": {
+    "bootstrap-llm-provider": "^1.2.0",
+    "bootstrap-alert": "^1.0.0",
+    "lit-html": "^3.0.0",
+    "asyncllm": "^2.0.0",
+    "marked": "^13.0.0"
+  },
+  "devDependencies": {
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "http-server": "^14.1.1"
+  },
+  "config": {
+    "defaultPort": 8000,
+    "architecture": "apiagent",
+    "requiredLibraries": [
+      "bootstrap-llm-provider",
+      "bootstrap-alert",
+      "lit-html",
+      "asyncllm",
+      "marked"
+    ],
+    "tools": {
+      "google_search": {
+        "enabled": true,
+        "description": "Search the web using Google Search API",
+        "simulated": true
+      },
+      "ai_pipe_proxy": {
+        "enabled": true,
+        "description": "AI Pipe proxy API for flexible dataflows",
+        "url": "https://aipipe.org/",
+        "documentation": "https://github.com/sanand0/aipipe",
+        "simulated": true
+      },
+      "javascript_execution": {
+        "enabled": true,
+        "description": "Execute JavaScript code for calculations and data processing",
+        "sandbox": true,
+        "timeout": 5000
+      }
+    }
+  },
+  "browser": {
+    "security": {
+      "sandbox": true,
+      "corsEnabled": false,
+      "allowedDomains": [
+        "api.openai.com",
+        "api.anthropic.com",
+        "llmfoundry.straive.com",
+        "openrouter.ai",
+        "cdn.jsdelivr.net"
+      ]
+    }
+  },
+  "inspiration": {
+    "basedOn": "https://github.com/sanand0/apiagent",
+    "libraries": {
+      "bootstrap-llm-provider": "https://github.com/sanand0/bootstrap-llm-provider",
+      "bootstrap-alert": "https://github.com/sanand0/bootstrap-alert"
+    }
+  }
+}

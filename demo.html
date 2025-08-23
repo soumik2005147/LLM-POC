@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Agent POC - Examples</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-robot%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M6%2012.5a.5.5%200%200%201-.5-.5v-2a.5.5%200%200%201%20.5-.5h4a.5.5%200%200%201%20.5.5v2a.5.5%200%200%201-.5.5H6z%22%2F%3E%3Cpath%20d%3D%22M3%208.062C3%206.76%204.235%205.765%205.53%205.886a26.58%2026.58%200%200%200%204.94%200C11.765%205.765%2013%206.76%2013%208.062v1.157a.933.933%200%200%201-.765.935c-.845.147-2.34.346-4.235.346-1.895%200-3.39-.2-4.235-.346A.933.933%200%200%201%203%209.219V8.062zm4.542-.827a.25.25%200%200%200-.217.068l-.92.9a24.767%2024.767%200%200%201-1.871-.183.25.25%200%200%200-.068.495c.55.076%201.232.149%202.02.193a.25.25%200%200%200%20.189-.071l.754-.736.847%201.71a.25.25%200%200%200%20.404.062l.932-.97a25.286%2025.286%200%200%200%201.922-.188.25.25%200%200%200-.068-.495c-.538.074-1.207.145-1.98.189a.25.25%200%200%200-.166.076l-.754.785-.842-1.7a.25.25%200%200%200-.182-.135z%22%2F%3E%3Cpath%20d%3D%22M8.5%201.866a1%201%200%201%200-1%200V3h-2A4.5%204.5%200%200%200%201%207.5V8a1%201%200%200%200-1%201v2a1%201%200%200%200%201%201v1a2%202%200%200%200%202%202h10a2%202%200%200%200%202-2v-1a1%201%200%200%200%201-1V9a1%201%200%200%200-1-1v-.5A4.5%204.5%200%200%200%2010.5%203h-2V1.866zM14%207.5V13a1%201%200%200%201-1%201H3a1%201%200%200%201-1-1V7.5A3.5%203.5%200%200%201%205.5%204h5A3.5%203.5%200%200%201%2014%207.5z%22%2F%3E%3C%2Fsvg%3E">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Dark theme overrides for better text readability */
+        body {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+        }
+        
+        .narrative {
+            max-width: 42rem;
+            color: #ffffff !important;
+        }
+        
+        .conversation-example {
+            border-left: 4px solid #007bff !important;
+            background: #343a40 !important;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.375rem;
+            color: #ffffff !important;
+        }
+        
+        .message {
+            margin: 0.5rem 0;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            color: #ffffff !important;
+        }
+        
+        .user-message {
+            background: #0d6efd !important;
+            color: #ffffff !important;
+        }
+        
+        .assistant-message {
+            background: #495057 !important;
+            color: #ffffff !important;
+        }
+        
+        .tool-result {
+            background: #664d03 !important;
+            color: #fff3cd !important;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+        }
+        
+        .card {
+            background-color: #343a40 !important;
+            border-color: #495057 !important;
+            color: #ffffff !important;
+        }
+        
+        .card-body {
+            color: #ffffff !important;
+        }
+        
+        .card-title {
+            color: #ffffff !important;
+        }
+        
+        .card-text {
+            color: #ffffff !important;
+        }
+        
+        .list-group-item {
+            background-color: #495057 !important;
+            border-color: #6c757d !important;
+            color: #ffffff !important;
+        }
+        
+        .badge {
+            background-color: #6c757d !important;
+            color: #ffffff !important;
+        }
+        
+        .text-muted {
+            color: #adb5bd !important;
+        }
+        
+        .lead {
+            color: #ffffff !important;
+        }
+        
+        /* Code styling */
+        code {
+            background-color: #495057 !important;
+            color: #f8f9fa !important;
+            padding: 0.125rem 0.25rem !important;
+        }
+        
+        pre {
+            background-color: #2d3339 !important;
+            color: #ffffff !important;
+            border: 1px solid #495057 !important;
+        }
+        
+        /* Link styling */
+        a {
+            color: #86b7fe !important;
+        }
+        
+        a:hover {
+            color: #b6d7ff !important;
+        }
+        
+        /* Navbar already has dark theme */
+        
+        /* Override Bootstrap variables for better contrast */
+        .bg-light {
+            background-color: #343a40 !important;
+        }
+        
+        .border {
+            border-color: #495057 !important;
+        }
+        
+        /* Make sure headings are visible */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff !important;
+        }
+        
+        /* Alert styling for dark theme */
+        .alert-info {
+            background-color: #1f4a5c !important;
+            border-color: #0c5460 !important;
+            color: #b6effb !important;
+        }
+        
+        .alert-warning {
+            background-color: #664d03 !important;
+            border-color: #99770a !important;
+            color: #fff3cd !important;
+        }
+        
+        /* Table styling */
+        .table {
+            color: #ffffff !important;
+        }
+        
+        .table-dark {
+            --bs-table-bg: #2d3339 !important;
+            --bs-table-border-color: #495057 !important;
+        }
+        
+        /* Ensure all text elements are readable */
+        p, span, div, li, td, th {
+            color: inherit !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-robot me-2"></i>LLM Agent POC
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="index.html">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Agent
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <main class="col-12">
+                <h1 class="display-4 my-4 text-center">Examples & Documentation</h1>
+                <h2 class="h4 text-center text-muted mb-4">See the LLM Agent in Action</h2>
+
+                <div class="mx-auto my-3 narrative">
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle me-2"></i>About This Agent</h5>
+                        <p class="mb-0">This LLM Agent demonstrates browser-based multi-tool reasoning. It can search the web, process data through AI workflows, and execute JavaScript code to solve complex problems step by step.</p>
+                    </div>
+
+                    <h3>Example Conversations</h3>
+
+                    <div class="conversation-example">
+                        <h5><i class="bi bi-chat-dots me-2"></i>Sample "Reasoning Loop" in Action</h5>
+                        <p><em>This demonstrates the exact conversation flow from the specification:</em></p>
+                        
+                        <div class="message user-message">
+                            <strong>👤 User:</strong> Interview me to create a blog post.
+                        </div>
+                        
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> Sure! What's the post about?
+                            <div class="mt-2">
+                                <em>output = "Sure! What's the post about?", tool_calls = []</em>
+                            </div>
+                        </div>
+                        
+                        <div class="message user-message">
+                            <strong>👤 User:</strong> About IBM
+                        </div>
+                        
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> Let me search for IBM to get current information for your blog post.
+                            <div class="mt-2">
+                                <em>output = "Let me search for IBM", tool_calls = [search("IBM")]</em>
+                            </div>
+                        </div>
+                        
+                        <div class="message tool-message">
+                            <strong>🔧 Google Search:</strong> IBM information: Founded in 1911, International Business Machines Corporation is a multinational technology company...
+                        </div>
+                        
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> OK, IBM is a big company founded in 1911. It's a multinational technology corporation known for cloud computing, AI (Watson), and enterprise solutions. What angle would you like to focus on for your blog post?
+                            <div class="mt-2">
+                                <em>output = "OK, IBM is a big company founded in ...", tool_calls = []</em>
+                            </div>
+                        </div>
+                        
+                        <div class="message user-message">
+                            <strong>👤 User:</strong> Next step, please.
+                        </div>
+                        
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> Great! Based on the IBM information, here are some compelling blog post angles you could explore:
+                            <ul>
+                                <li>IBM's AI journey from Watson to modern enterprise AI</li>
+                                <li>How IBM transformed from hardware to cloud and consulting</li>
+                                <li>IBM's role in the hybrid cloud revolution</li>
+                            </ul>
+                            Which direction interests you most?
+                        </div>
+                    </div>
+
+                    <div class="conversation-example">
+                        <h5><i class="bi bi-chat-dots me-2"></i>Web Search & Analysis</h5>
+                        <div class="message user-message">
+                            <strong>👤 User:</strong> What are the current trends in artificial intelligence for 2024?
+                        </div>
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> I'll search for the latest AI trends in 2024 to give you current information.
+                            <div class="mt-2">
+                                <em>🔧 Tool Call: google_search("AI trends 2024")</em>
+                            </div>
+                        </div>
+                        <div class="message tool-message">
+                            <strong>🔧 Google Search:</strong> Found results about generative AI, multimodal models, AI agents, and enterprise adoption...
+                        </div>
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> Based on my search, here are the key AI trends for 2024:
+                            <ul>
+                                <li><strong>Generative AI Maturation</strong> - Moving from experimentation to production</li>
+                                <li><strong>Multimodal AI Models</strong> - Combining text, image, and audio processing</li>
+                                <li><strong>AI Agents & Automation</strong> - Autonomous systems handling complex workflows</li>
+                                <li><strong>Enterprise AI Adoption</strong> - Widespread integration in business processes</li>
+                                <li><strong>Edge AI Computing</strong> - AI processing on local devices</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="conversation-example">
+                        <h5><i class="bi bi-calculator me-2"></i>Mathematical Calculations</h5>
+                        <div class="message user-message">
+                            <strong>👤 User:</strong> Calculate the compound interest on $10,000 invested at 5% annually for 10 years.
+                        </div>
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> I'll calculate the compound interest using the formula A = P(1 + r)^t
+                            <div class="mt-2">
+                                <em>🔧 Tool Call: javascript_execution</em>
+                            </div>
+                        </div>
+                        <div class="message tool-message">
+                            <strong>🔧 JavaScript:</strong>
+                            <div class="code-block">
+const principal = 10000;
+const rate = 0.05;
+const time = 10;
+const amount = principal * Math.pow(1 + rate, time);
+const interest = amount - principal;
+
+return {
+    principal: principal,
+    rate: rate * 100 + "%",
+    time: time + " years",
+    final_amount: "$" + amount.toFixed(2),
+    compound_interest: "$" + interest.toFixed(2)
+};
+                            </div>
+                        </div>
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> Here's your compound interest calculation:
+                            <ul>
+                                <li><strong>Principal:</strong> $10,000</li>
+                                <li><strong>Interest Rate:</strong> 5% annually</li>
+                                <li><strong>Time Period:</strong> 10 years</li>
+                                <li><strong>Final Amount:</strong> $16,288.95</li>
+                                <li><strong>Compound Interest Earned:</strong> $6,288.95</li>
+                            </ul>
+                            Your investment would grow by 62.89% over 10 years with compound interest!
+                        </div>
+                    </div>
+
+                    <div class="conversation-example">
+                        <h5><i class="bi bi-robot me-2"></i>AI Processing Workflow</h5>
+                        <div class="message user-message">
+                            <strong>👤 User:</strong> Analyze this text and extract key insights: "The quarterly revenue increased by 23% due to strong performance in the cloud computing division."
+                        </div>
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> I'll process this business text through AI analysis to extract structured insights.
+                            <div class="mt-2">
+                                <em>🔧 Tool Call: ai_pipe_proxy("text analysis", "quarterly revenue data")</em>
+                            </div>
+                        </div>
+                        <div class="message tool-message">
+                            <strong>🔧 AI Pipe:</strong> Processing text analysis workflow...
+                            <ul>
+                                <li>Entity extraction: Revenue metrics, business divisions</li>
+                                <li>Sentiment analysis: Positive business performance</li>
+                                <li>Key metrics: 23% growth rate</li>
+                                <li>Performance driver: Cloud computing division</li>
+                            </ul>
+                        </div>
+                        <div class="message agent-message">
+                            <strong>🤖 Agent:</strong> Here are the key insights from your business text:
+                            <ul>
+                                <li><strong>Growth Rate:</strong> 23% quarterly revenue increase</li>
+                                <li><strong>Performance Driver:</strong> Cloud computing division</li>
+                                <li><strong>Business Health:</strong> Strong positive performance indicator</li>
+                                <li><strong>Strategic Focus:</strong> Cloud services are a key revenue driver</li>
+                            </ul>
+                            This suggests successful digital transformation and strong market position in cloud services.
+                        </div>
+                    </div>
+
+                    <h3>Key Features</h3>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-search text-primary"></i> Web Search</h5>
+                                    <p class="card-text">Access current information from the web using Google Search API integration.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-robot text-success"></i> AI Processing</h5>
+                                    <p class="card-text">Leverage AI Pipe proxy for advanced data transformations and analysis workflows.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-code-square text-warning"></i> Code Execution</h5>
+                                    <p class="card-text">Execute JavaScript code for calculations, data processing, and complex logic.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Architecture</h3>
+                    <p>This agent is built using modern web technologies and follows the <a href="https://github.com/sanand0/apiagent" target="_blank">apiagent</a> design pattern:</p>
+                    <ul>
+                        <li><strong>Frontend:</strong> HTML, CSS (Bootstrap 5.3), JavaScript ES6+ modules</li>
+                        <li><strong>LLM Integration:</strong> <a href="https://github.com/sanand0/bootstrap-llm-provider" target="_blank">bootstrap-llm-provider</a> for model selection</li>
+                        <li><strong>Error Handling:</strong> <a href="https://github.com/sanand0/bootstrap-alert" target="_blank">bootstrap-alert</a> for user notifications</li>
+                        <li><strong>Templating:</strong> lit-html for reactive UI updates</li>
+                        <li><strong>Streaming:</strong> asyncLLM for real-time response streaming</li>
+                        <li><strong>Markdown:</strong> marked for rich text formatting</li>
+                    </ul>
+
+                    <h3>Getting Started</h3>
+                    <ol>
+                        <li>Configure your LLM provider (OpenAI, Claude, etc.) in the main interface</li>
+                        <li>Enter your API key - it's stored locally in your browser</li>
+                        <li>Ask questions that require web search, calculations, or data processing</li>
+                        <li>Watch the agent reason through the problem step by step</li>
+                        <li>See real-time tool usage and results</li>
+                    </ol>
+
+                    <div class="alert alert-success mt-4">
+                        <h5><i class="bi bi-lightbulb me-2"></i>Try It Out!</h5>
+                        <p class="mb-0">
+                            Ready to see the agent in action? 
+                            <a href="index.html" class="btn btn-success btn-sm ms-2">
+                                <i class="bi bi-arrow-right me-1"></i>Go to Agent Interface
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@gramex/ui@0.3/dist/dark-theme.js" type="module"></script>
+</body>
+</html>
