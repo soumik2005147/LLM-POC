@@ -1,3 +1,42 @@
+// Configuration panel logic
+const providerSelect = document.getElementById('provider-select');
+const apiTokenInput = document.getElementById('api-token');
+const modelSelect = document.getElementById('model-select');
+const saveConfigBtn = document.getElementById('save-config');
+const providerInfo = document.getElementById('provider-info');
+
+let config = {
+    provider: providerSelect.value,
+    apiToken: '',
+    model: modelSelect.value
+};
+
+providerSelect.onchange = function() {
+    if (providerSelect.value === 'ai-pipe') {
+        providerInfo.textContent = "AI Pipe provides free access ($0.10/week). No API key needed - you'll be redirected to login.";
+        apiTokenInput.disabled = true;
+    } else {
+        providerInfo.textContent = "Enter your OpenAI API key.";
+        apiTokenInput.disabled = false;
+    }
+};
+
+saveConfigBtn.onclick = function(e) {
+    e.preventDefault();
+    config.provider = providerSelect.value;
+    config.apiToken = apiTokenInput.value;
+    config.model = modelSelect.value;
+    showAlert('Configuration saved!', 'success');
+    showWelcomeMessage();
+};
+
+function showWelcomeMessage() {
+    chatWindow.innerHTML = '';
+    appendMessage('LLM Agent', "Hello! I'm your AI agent with access to web search, AI processing, and code execution tools. Please configure your LLM provider above to get started.");
+}
+
+// Show welcome message on load
+showWelcomeMessage();
 // Modern LLM Agent with AI Pipe integration and chatbox interface
 // Uses AI Pipe, bootstrap-alert, lit-html, asyncLLM, and marked
 
@@ -13,6 +52,81 @@ const marked = new Marked();
 // DOM elements
 const $chatForm = document.querySelector('#chat-form');
 const $chatMessages = document.querySelector('#chat-messages');
+// Minimal LLM chat app with tool integrations
+const chatWindow = document.getElementById('chat-window');
+const chatForm = document.getElementById('chat-form');
+const userInput = document.getElementById('message-input');
+const alertContainer = document.getElementById('alert-container');
+
+function showAlert(message, type = 'danger') {
+    alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+}
+
+function appendMessage(sender, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = sender === 'user' ? 'text-end mb-2' : 'text-start mb-2';
+    msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatWindow.appendChild(msgDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+chatForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const text = userInput.value.trim();
+    if (!text) return;
+    appendMessage('user', text);
+    userInput.value = '';
+    try {
+        const response = await callLLM(text);
+        appendMessage('LLM', response);
+    } catch (err) {
+        showAlert(err.message || 'Error calling LLM');
+    }
+};
+
+// OpenAI tool-calling interface stub
+async function callLLM(message) {
+    // Replace with actual OpenAI API call and tool-calling logic
+    return `Echo: ${message}`;
+}
+
+// Tool integrations (stubs)
+function runGoogleSearch() {
+    try {
+        // Replace with actual Google Search Snippet API call
+        appendMessage('tool', 'Google Search: [stub result]');
+    } catch (err) {
+        showAlert('Google Search error: ' + err.message);
+    }
+}
+
+function runAIPipe() {
+    try {
+        // Replace with actual AI Pipe proxy API call
+        appendMessage('tool', 'AI Pipe API: [stub result]');
+    } catch (err) {
+        showAlert('AI Pipe error: ' + err.message);
+    }
+}
+
+function runSandboxJS() {
+    try {
+        // Minimal JS sandbox (unsafe, for demo only)
+        const code = prompt('Enter JS code to run:');
+        if (code) {
+            let result;
+            try {
+                result = eval(code);
+            } catch (e) {
+                showAlert('JS error: ' + e.message);
+                return;
+            }
+            appendMessage('tool', 'JS Result: ' + result);
+        }
+    } catch (err) {
+        showAlert('Sandbox error: ' + err.message);
+    }
+}
 const $messageInput = document.querySelector('#message-input');
 const $sendButton = document.querySelector('#send-button');
 const $configPanel = document.querySelector('#config-panel');

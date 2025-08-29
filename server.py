@@ -51,7 +51,7 @@ def check_files():
             print(f"  ❌ Missing {filename}")
     print()
 
-def open_browser_with_cache_busting(port=8000, delay=2):
+def open_browser_with_cache_busting(port=8082, delay=2):
     """Open browser with cache-busting parameters after a delay."""
     def delayed_open():
         time.sleep(delay)
@@ -73,7 +73,7 @@ def open_browser_with_cache_busting(port=8000, delay=2):
     browser_thread = threading.Thread(target=delayed_open, daemon=True)
     browser_thread.start()
 
-def start_server(port=8000):
+def start_server(port=8082):
     """Start the cache-busting HTTP server."""
     
     print("=" * 50)
@@ -123,7 +123,7 @@ def start_server(port=8000):
 
 if __name__ == "__main__":
     # You can change the port here if needed
-    SERVER_PORT = 8000
+    SERVER_PORT = 8082
     
     try:
         start_server(SERVER_PORT)
